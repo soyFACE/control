@@ -36,6 +36,10 @@
 #define OZONE_MAX 200 		// Maximum value Ozone can set to
 #define delay_time 30		// Time Delay for Ozone Restart after low wind speed shut down  //Changed to 30 from 120 for testing
 #define N_CHANNELS 1			// Number of Channels to Operate (Layers)
+#define STARTTIME_OZONE 9
+#define STOPTIME_OZONE 18
+#define STARTTIME_CO2 8
+#define STOPTIME_CO2 18
 
 #define MATCHFLAG RN_MATCH_PRDID	//set flag to search for product ID
 #define MATCHPID  RN1300			//match DAC board product ID
@@ -1274,7 +1278,7 @@ for(chn=0;chn < N_CHANNELS;chn++)
 
 if(LAYER[chn]==0)  // CO2 CONTROL LAYER
 	{
-	if (((ora>sunr && ora<suns) || (nighttime_remote && nighttime_local)) && CO2_loc && CO2_rem)   // Esegue le operazioni solo di giorno 18.08.2000
+	if (((ora >= STARTIME_CO2 && ora < STOPTIME_CO2) || (nighttime_remote && nighttime_local)) && CO2_loc && CO2_rem)   // Esegue le operazioni solo di giorno 18.08.2000
 	{
         if (nSel>=MOBILE && s45>0.5)
         {
@@ -1338,7 +1342,7 @@ if(LAYER[chn]==1)  // OZONE CONTROL LAYER
 {
 
 //tam0509 if ((ora>sunr && ora<suns)  && ozonator_rem )
-if ((ora>10 && ora<18)  && ozonator_rem )
+if ((ora >= STARTTIME_OZONE && ora < STOPTIME_OZONE)  && ozonator_rem )
    {
    digOut(0, TURNON);  //CHANGE2003
    ozone_power=1;
@@ -1358,7 +1362,7 @@ if (delay_restart)   //  Check for timeout if in ozone delay restart
 
 
 //tam0509 if ((ora>sunr && ora<suns) && ozonator_loc && ozonator_rem && !purge && !delay_restart)   // Esegue le operazioni solo di giorno 18.08.2000
-if ((ora>10 && ora<18) && ozonator_loc && ozonator_rem && !purge && !delay_restart)   // Esegue le operazioni solo di giorno 18.08.2000
+if ((ora >= STARTTIME_OZONE && ora < STOPTIME_OZONE) && ozonator_loc && ozonator_rem && !purge && !delay_restart)   // Esegue le operazioni solo di giorno 18.08.2000
 	{
         if (nSel>=MOBILE && s45>0.5)
         {
@@ -1522,7 +1526,7 @@ void fControl(void)
 	nContao[chn]++;
    if(LAYER[chn]==0)  // CO2 CONTROL LAYER
    {
-   if ((ora<sunr || ora>suns) && (nighttime_remote && nighttime_local))
+   if ((ora <= STARTTIME_CO2 || ora > STOPTIME_CO2) && (nighttime_remote && nighttime_local))
    	{
       TARG[chn]=  nighttimeCO2;
       }
@@ -1544,7 +1548,7 @@ void fControl(void)
 	if(LAYER[chn]==0)  // CO2 CONTROL LAYER
 	{
    	//if (ora<sunr | ora>suns | !nighttime_remote | !nighttime_local | !CO2_rem | !CO2_loc)   // If nighttime_remote
-      if(((ora<sunr || ora>suns) && !(nighttime_remote && nighttime_local))|| !CO2_rem || !CO2_loc )
+      if(((ora <= STARTTIME_CO2 || ora > STOPTIME_CO2) && !(nighttime_remote && nighttime_local))|| !CO2_rem || !CO2_loc )
       {
 	  	fVs[chn]=0;
       }
@@ -1668,7 +1672,7 @@ else
 	if(LAYER[chn]==1)  // O3 CONTROL LAYER
 	{
    	//tam0509 if (ora<sunr || ora>suns || !ozonator_loc || !ozonator_rem || !flow  )   // If nighttime or ozone off
-      if (ora<10 || ora>18 || !ozonator_loc || !ozonator_rem || !flow  )   // If nighttime or ozone off
+      if (ora <=  STARTTIME_OZONE || ora > STOPTIME_OZONE || !ozonator_loc || !ozonator_rem || !flow  )   // If nighttime or ozone off
 	  	{
 	  	fVs[chn]=0;
       }
@@ -1806,7 +1810,7 @@ for(chn=0;chn < N_CHANNELS+1;chn++)
 	{
 	if(LAYER[chn]==0)  // CO2 CONTROL LAYER
 		{
-		if ((ora<sunr || ora>suns) && !(nighttime_remote && nighttime_local))   // Esegue le operazioni solo di giorno 18.08.2000
+		if ((ora <= STARTTIME_CO2 || ora > STOPTIME_CO2) && !(nighttime_remote && nighttime_local))   // Esegue le operazioni solo di giorno 18.08.2000
 			{
       	//anaOutVolts( chn, 0);
          #ifdef EXTDA
@@ -1830,7 +1834,7 @@ for(chn=0;chn < N_CHANNELS+1;chn++)
    if(LAYER[chn]==1)  // O3 CONTROL LAYER
 		{
 		//tam0509 if (ora<sunr || ora>suns)   // Esegue le operazioni solo di giorno 18.08.2000
-      if (ora<10 || ora>18)   // Esegue le operazioni solo di giorno 18.08.2000
+      if (ora <= STARTTIME_OZONE || ora > STOPTIME_OZONE)   // Esegue le operazioni solo di giorno 18.08.2000
 			{
       	//anaOutVolts( DA_Channel[chn], 0);
           #ifdef EXTDA
@@ -2279,7 +2283,7 @@ void readString_E(void) //CONNECTION TO OP6800 DISPLAY
 
             ozonator_rem = atoi(token);	//set ozone
 				//tam0509 if ((ora>sunr && ora<suns)  && ozonator_rem ) digOut(ChanAddr(RELAY, 0),TURNON);
-            if ((ora>10 && ora<18)  && ozonator_rem ) digOut(0,TURNON);
+            if ((ora >= STARTTIME_OZONE && ora < STOPTTIME_OZONE)  && ozonator_rem ) digOut(0,TURNON);
             else digOut(0,TURNOFF);
 
 				token = strtok(NULL,delim);
@@ -2545,7 +2549,7 @@ void readString_IP(void)
 				token = strtok(NULL,delim);
 				ozonator_rem = atoi(token);	//set ozone
 				//tam0509 if ((ora>sunr && ora<suns)  && ozonator_rem ) digOut(ChanAddr(RELAY, 0),TURNON);
-            if ((ora>10 && ora<18)  && ozonator_rem ) digOut(0,TURNON);
+            if ((ora >= STARTTIME_OZONE && ora < STOPTIME_OZONE)  && ozonator_rem ) digOut(0,TURNON);
             else digOut( 0,TURNOFF);
 
 				token = strtok(NULL,delim);
@@ -2702,5 +2706,4 @@ if (writemode == 1)
    printf("Data written OK. \n");
 }
 #endif
-
 
