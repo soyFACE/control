@@ -1278,7 +1278,7 @@ for(chn=0;chn < N_CHANNELS;chn++)
 
 if(LAYER[chn]==0)  // CO2 CONTROL LAYER
 	{
-	if (((ora >= STARTIME_CO2 && ora < STOPTIME_CO2) || (nighttime_remote && nighttime_local)) && CO2_loc && CO2_rem)   // Esegue le operazioni solo di giorno 18.08.2000
+	if (((ora >= STARTTIME_CO2 && ora < STOPTIME_CO2) || (nighttime_remote && nighttime_local)) && CO2_loc && CO2_rem)   // Esegue le operazioni solo di giorno 18.08.2000
 	{
         if (nSel>=MOBILE && s45>0.5)
         {
@@ -2283,7 +2283,7 @@ void readString_E(void) //CONNECTION TO OP6800 DISPLAY
 
             ozonator_rem = atoi(token);	//set ozone
 				//tam0509 if ((ora>sunr && ora<suns)  && ozonator_rem ) digOut(ChanAddr(RELAY, 0),TURNON);
-            if ((ora >= STARTTIME_OZONE && ora < STOPTTIME_OZONE)  && ozonator_rem ) digOut(0,TURNON);
+            if ((ora >= STARTTIME_OZONE && ora < STOPTIME_OZONE)  && ozonator_rem ) digOut(0,TURNON);
             else digOut(0,TURNOFF);
 
 				token = strtok(NULL,delim);
